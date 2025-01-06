@@ -16,6 +16,7 @@ class AuthCheck extends StatelessWidget {
       child: Scaffold(
         body: BlocBuilder<AuthBloc, AuthState>(
           builder: (context, state) {
+            print(state);
             if (state is AuthLoading) {
               return const Center(child: CircularProgressIndicator());
             } else if (state is AuthAuthenticated) {

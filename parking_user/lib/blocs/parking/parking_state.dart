@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:parking_shared/models/parking.dart';
 import 'package:parking_shared/models/parking_space.dart';
 
@@ -32,12 +33,10 @@ class ParkingSearchResult extends ParkingState {
 }
 
 class ParkingLoaded extends ParkingState {
-  final List<ParkingSpace> parkingSpaces;
+  final Set<Marker> markers;
+  final List<ParkingSpace> filteredParkingSpaces;
 
-  ParkingLoaded(this.parkingSpaces);
-
-  @override
-  List<Object> get props => [parkingSpaces];
+  ParkingLoaded({required this.markers, required this.filteredParkingSpaces});
 }
 
 class ActiveParkingsLoaded extends ParkingState {

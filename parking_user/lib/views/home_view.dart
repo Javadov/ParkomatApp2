@@ -1,5 +1,3 @@
-// ignore_for_file: unused_field
-
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:parking_shared/models/parking.dart';
@@ -64,7 +62,7 @@ class _HomeViewState extends State<HomeView> {
     }
   }
 
-   void _updateMarkers() {
+  void _updateMarkers() {
     _markers.clear();
     for (var parkingSpace in _filteredParkingSpaces) {
       _markers.add(

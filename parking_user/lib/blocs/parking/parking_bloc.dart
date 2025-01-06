@@ -12,6 +12,7 @@ class ParkingBloc extends Bloc<ParkingEvent, ParkingState> {
     on<StartParkingEvent>(_onStartParking);
     on<LoadActiveParkings>(_onLoadActiveParkings);
     on<LoadParkingHistory>(_onLoadParkingHistory);
+    on<ClearSearch>(_onClearSearch);
   }
 
   Future<void> _onLoadParkingSpaces(
@@ -87,6 +88,17 @@ class ParkingBloc extends Bloc<ParkingEvent, ParkingState> {
       emit(ParkingHistoryLoaded(history));
     } catch (e) {
       emit(ParkingError('Failed to load parking history: $e'));
+    }
+  }
+
+
+  void _onClearSearch(
+    ClearSearch event,
+    Emitter<ParkingState> emit,
+  ) {
+    if (state is ParkingLoaded) {
+      final currentState = state as ParkingLoaded;
+      emit(ParkingLoaded(markers: currentState.markers, filteredParkingSpaces: currentState.filteredParkingSpaces));
     }
   }
 }

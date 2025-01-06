@@ -27,15 +27,26 @@ class _MainLayoutState extends State<MainLayout> {
   late Widget _activePage;
   int _activeParkingCount = 0;
 
+  final ParkingRepository parkingRepository = ParkingRepository();
+
   final List<Widget> _defaultPages = [
     const HomeView(),
     const MyParkingsView(),
     const ProfileView(),
-  ];
+   ];
 
   @override
   void initState() {
     super.initState();
+
+    // Initialisera standard-sidorna med parkingRepository
+    // _defaultPages.addAll([
+    //   HomeView(), // Pass parkingRepository här
+    //   MyParkingsView(), // Om denna också behöver det
+    //   ProfileView(),
+    // ]);
+
+
     _activePage = _defaultPages[_currentIndex];
     _loadActiveParkingCount();
   }
@@ -84,7 +95,7 @@ class _MainLayoutState extends State<MainLayout> {
           if (state is ActiveParkingsLoaded) {
             _activeParkingCount = state.activeParkings.length;
           } else if (state is ParkingError) {
-            _activeParkingCount = 0; // Om det uppstår ett fel, visa ingen aktiv parkering
+            _activeParkingCount = 0; 
           }
 
           return BottomNavigationBar(

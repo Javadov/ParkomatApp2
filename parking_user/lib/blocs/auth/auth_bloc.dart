@@ -19,9 +19,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthLoading());
     try {
       final prefs = await SharedPreferences.getInstance();
+      final userMail = UserSession().email;
+
+      if (userMail != null) {
+        await prefs.setBool('isLoggedIn', true);
+        await prefs.setString('userEmail', userMail);
+      } else {
+        await prefs.setBool('isLoggedIn', false);
+      }
+
       final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
 
-      print('isLoggedIn: ${isLoggedIn}');
       if (isLoggedIn) {
         emit(AuthAuthenticated());
       } else {
@@ -60,6 +68,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(AuthError('Nätverksfel, försök igen senare'));
     }
   }
+
 
   Future<void> _onLogoutEvent(LogoutEvent event, Emitter<AuthState> emit) async {
     emit(AuthLoading());

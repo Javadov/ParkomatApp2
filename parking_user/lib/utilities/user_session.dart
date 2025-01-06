@@ -16,14 +16,14 @@ class UserSession {
   Future<void> loadSession() async {
     final prefs = await SharedPreferences.getInstance();
     email = prefs.getString('email');
-    userId = prefs.getInt('userId'); // Load userId from shared preferences
+    userId = prefs.getInt('userId');
   }
 
   Future<void> saveSession() async {
     final prefs = await SharedPreferences.getInstance();
     if (email != null && userId != null) {
       prefs.setString('email', email!);
-      prefs.setInt('userId', userId!); // Save userId to shared preferences
+      prefs.setInt('userId', userId!);
       prefs.setBool('isLoggedIn', true);
     }
   }
@@ -31,10 +31,10 @@ class UserSession {
   Future<void> clear() async {
     final prefs = await SharedPreferences.getInstance();
     prefs.remove('email');
-    prefs.remove('userId'); // Remove userId from shared preferences
+    prefs.remove('userId');
     prefs.setBool('isLoggedIn', false);
     email = null;
-    userId = null; // Clear userId
+    userId = null;
     vehicles.clear();
   }
 }
