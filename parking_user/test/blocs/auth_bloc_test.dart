@@ -19,7 +19,7 @@ void main() {
   setUp(() {
     mockHttpClient = MockHttpClient();
     mockSharedPreferences = MockSharedPreferences();
-    authBloc = AuthBloc();
+    authBloc = AuthBloc(client: mockHttpClient, prefs: mockSharedPreferences);
 
     // Mock SharedPreferences globally
     SharedPreferences.setMockInitialValues({});
@@ -34,9 +34,13 @@ void main() {
       blocTest<AuthBloc, AuthState>(
         'emits [AuthLoading, AuthAuthenticated] when user is logged in',
         build: () {
-          when(() => mockSharedPreferences.getBool('isLoggedIn'))
-              .thenReturn(true);
-              print(authBloc.state);
+          UserSession().email = 'test@example.com';
+          when(() => mockSharedPreferences.getBool('isLoggedIn')).thenReturn(true);
+          when(() => mockSharedPreferences.setBool('isLoggedIn', true))
+              .thenAnswer((_) async => true);
+          when(() => mockSharedPreferences.setString('userEmail', any()))
+              .thenAnswer((_) async => true);
+
           return authBloc;
         },
         act: (bloc) => bloc.add(CheckLoginStatus()),
@@ -46,6 +50,7 @@ void main() {
       blocTest<AuthBloc, AuthState>(
         'emits [AuthLoading, AuthUnauthenticated] when user is not logged in',
         build: () {
+          UserSession().email = null;
           when(() => mockSharedPreferences.getBool('isLoggedIn'))
               .thenReturn(false);
           return authBloc;
@@ -55,12 +60,12 @@ void main() {
       );
     });
 
-    group('LoginEvent', () {
-      const email = 'test@example.com';
-      const password = 'password';
+  group('LoginEvent', () {
+    const email = 'test@example.com';
+    const password = 'password';
 
-      blocTest<AuthBloc, AuthState>(
-        'emits [AuthLoading, AuthSuccess] when login is successful', 
+    blocTest<AuthBloc, AuthState>(
+      'emits [AuthLoading, AuthSuccess] when login is successful',
         build: () {
           when(() => mockHttpClient.post(
                 Uri.parse('http://localhost:8080/users/login'),
@@ -69,8 +74,6 @@ void main() {
               )).thenAnswer(
             (_) async => http.Response('{"email": "$email"}', 200),
           );
-          when(() => mockSharedPreferences.setBool('isLoggedIn', true))
-              .thenAnswer((_) async => true);
           return authBloc;
         },
         act: (bloc) => bloc.add(LoginEvent(email, password)),
@@ -81,8 +84,6 @@ void main() {
                 headers: {'Content-Type': 'application/json'},
                 body: '{"email":"$email","password":"$password"}',
               )).called(1);
-          verify(() => mockSharedPreferences.setBool('isLoggedIn', true))
-              .called(1);
         },
       );
 

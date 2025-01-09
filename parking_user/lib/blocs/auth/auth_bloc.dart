@@ -8,7 +8,10 @@ import 'auth_event.dart';
 import 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  AuthBloc() : super(AuthInitial()) {
+  final http.Client client;
+  final SharedPreferences prefs;
+
+  AuthBloc({required this.client, required this.prefs}) : super(AuthInitial()) {
     on<CheckLoginStatus>(_onCheckLoginStatus);
     on<LoginEvent>(_onLoginEvent);
     on<LogoutEvent>(_onLogoutEvent);
@@ -40,11 +43,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  Future<void> _onLoginEvent(
-      LoginEvent event, Emitter<AuthState> emit) async {
+  Future<void> _onLoginEvent(LoginEvent event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
     try {
-      final response = await http.post(
+      final response = await client.post(
         Uri.parse('http://localhost:8080/users/login'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'email': event.email, 'password': event.password}),
@@ -73,7 +75,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   Future<void> _onLogoutEvent(LogoutEvent event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
     try {
-      final prefs = await SharedPreferences.getInstance();
       await prefs.remove('isLoggedIn');
       emit(AuthUnauthenticated());
     } catch (e) {
